@@ -21,6 +21,7 @@ pub mod ui {
     pub mod clicks;
     pub mod layer;
     pub mod window;
+    pub mod window_stack;
 }
 
 pub mod std_c;

@@ -75,6 +75,17 @@ pub struct WindowRef<T = ()> {
 pub type ClickHandler<T> = extern "C" fn(ClickRecognizerRef, WindowRef<T>);
 
 impl<T> WindowRef<T> {
+    pub unsafe fn from_raw(inner: *mut sys::Window) -> Self {
+        Self {
+            inner,
+            marker: PhantomData,
+        }
+    }
+
+    pub unsafe fn try_from_raw(inner: *mut sys::Window) -> Option<Self> {
+        unsafe { (!inner.is_null()).then(|| Self::from_raw(inner)) }
+    }
+
     pub fn single_click_subscribe(&self, button_id: ButtonId, handler: ClickHandler<T>) {
         unsafe {
             sys::window_single_click_subscribe(button_id.into(), transmute_handler_click(handler))
@@ -176,6 +187,9 @@ pub trait WindowHandle<T>: sealed::AsRawWindow {
         unsafe { &mut *sys::window_get_user_data(self.as_raw()).cast::<T>() }
     }
 }
+
+impl<T> WindowHandle<T> for Window<T> {}
+impl<T> WindowHandle<T> for WindowRef<T> {}
 
 pub trait WindowHandlers<T> {
     extern "C" fn load(window: WindowRef<T>);

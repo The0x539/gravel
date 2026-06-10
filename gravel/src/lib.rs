@@ -29,10 +29,17 @@ pub mod foundation {
     pub mod dictionary;
 }
 
+pub mod graphics {
+    pub mod types {
+        pub use gravel_sys::graphics::types::*;
+    }
+}
+
 pub mod ui {
     pub mod clicks;
     pub mod layer;
     pub mod window;
+    pub mod window_stack;
 }
 
 pub mod prelude {
