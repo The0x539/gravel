@@ -37,17 +37,32 @@ pub mod foundation {
         pub mod tick_timer;
         pub mod touch;
     }
+    // pub mod exit_reason;
+    // pub mod i18n;
+    // pub mod launch_reason;
+    // pub mod logging;
+    // pub mod math;
+    // pub mod memory_management;
+    // pub mod platform;
+    // pub mod resources;
+    // pub mod storage;
+    // pub mod timer;
+    // pub mod wakeup;
+    // pub mod wall_time;
+    // pub mod watch_info;
 }
 
-pub mod graphics {
-    pub mod types {
-        pub use gravel_sys::graphics::types::*;
-    }
-}
+pub mod graphics;
 
 pub mod ui {
+    // pub mod animation;
     pub mod clicks;
     pub mod layer;
+    // pub mod light;
+    // pub mod preferences;
+    // pub mod speaker;
+    // pub mod unobstructed_area;
+    // pub mod vibes;
     pub mod window;
     pub mod window_stack;
 }
