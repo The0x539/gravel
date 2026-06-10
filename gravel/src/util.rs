@@ -1,3 +1,11 @@
+use alloc::boxed::Box;
+
+pub(crate) unsafe fn drop_raw_box<T>(ptr: *mut T) {
+    if !ptr.is_null() {
+        unsafe { drop(Box::from_raw(ptr)) }
+    }
+}
+
 pub(crate) trait SysResult {
     type NiceErr;
     fn into_nice(self) -> Result<(), Self::NiceErr>;

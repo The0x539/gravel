@@ -27,6 +27,12 @@ pub mod foundation {
     pub mod dictionary;
 }
 
+pub mod ui {
+    pub mod clicks;
+    pub mod layer;
+    pub mod window;
+}
+
 #[panic_handler]
 fn panic(_info: &core::panic::PanicInfo) -> ! {
     loop {}
