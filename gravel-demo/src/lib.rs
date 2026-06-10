@@ -7,10 +7,16 @@ use gravel::ui::layer::BitmapLayer;
 use gravel::ui::window::Window;
 use gravel::ui::window_stack;
 
+use gravel::log;
+
 const MRGREEN: &[u8] = include_bytes!("./mrgreen.png");
 
 #[unsafe(no_mangle)]
 pub extern "C" fn main() -> isize {
+    unsafe {
+        log!(Info, c"foo\n");
+    }
+
     let window = Window::new();
 
     window.set_background_color(GColor::from_argb(3, 1, 2, 3));

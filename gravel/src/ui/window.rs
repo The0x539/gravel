@@ -5,7 +5,7 @@ use gravel_sys::{graphics::types::GColor, ui::window as sys};
 use crate::{
     ui::{
         clicks::{ButtonId, ClickRecognizerRef},
-        layer::{LayerHandle, LayerRef},
+        layer::LayerRef,
     },
     util::drop_raw_box,
 };
