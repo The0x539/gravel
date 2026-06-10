@@ -35,6 +35,11 @@ pub mod ui {
     pub mod window;
 }
 
+pub mod prelude {
+    pub use crate::ui::layer::LayerHandle;
+    pub use crate::ui::window::WindowHandle;
+}
+
 #[panic_handler]
 fn panic(_info: &core::panic::PanicInfo) -> ! {
     loop {}
