@@ -4,7 +4,7 @@ macro_rules! c_enum {
         $($variant:ident = $value:literal;)*
     ) => {
         #[repr(transparent)]
-        #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+        #[derive(Debug, /* Default, */ Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
         $vis struct $T(pub $inner);
 
         impl $T {

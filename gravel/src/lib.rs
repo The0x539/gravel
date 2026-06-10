@@ -27,6 +27,9 @@ pub mod foundation {
     pub mod data_logging;
     pub mod dictation;
     pub mod dictionary;
+    pub mod event {
+        pub mod accelerometer;
+    }
 }
 
 pub mod graphics {
