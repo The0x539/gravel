@@ -13,13 +13,13 @@ pub mod foundation {
     pub mod dictionary;
     pub mod event {
         pub mod accelerometer;
-        // pub mod app_focus;
-        // pub mod battery_state;
-        // pub mod compass;
-        // pub mod connection;
+        pub mod app_focus;
+        pub mod battery_state;
+        pub mod compass;
+        pub mod connection;
         // pub mod health;
-        // pub mod tick_timer;
-        // pub mod touch;
+        pub mod tick_timer;
+        pub mod touch;
     }
 }
 
