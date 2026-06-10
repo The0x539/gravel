@@ -2,6 +2,17 @@ use core::marker::PhantomData;
 
 use gravel_sys::{graphics::types::GRect, ui::layer as sys};
 
+// pub mod action_bar;
+mod bitmap;
+// pub mod menu;
+// pub mod rot_bitmap;
+// pub mod scroll;
+// pub mod simple_menu;
+// pub mod status_bar;
+// pub mod text;
+
+pub use bitmap::BitmapLayer;
+
 pub struct Layer<T> {
     inner: *mut sys::Layer,
     marker: PhantomData<*mut T>,
@@ -100,6 +111,12 @@ pub trait LayerHandle<T>: sealed::AsRawLayer {
     /// SAFETY: There's no way to verify that this is the only handle referencing this layer.
     unsafe fn user_data_mut(&mut self) -> &mut T {
         unsafe { &mut *sys::layer_get_data(self.as_raw()).cast::<T>() }
+    }
+
+    fn add_child<U>(&self, child: &impl LayerHandle<U>) {
+        unsafe {
+            sys::layer_add_child(self.as_raw(), child.as_raw());
+        }
     }
 }
 

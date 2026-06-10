@@ -26,7 +26,7 @@ unsafe extern "C" {
         base_bitmap: *const GBitmap,
         sub_rect: GRect,
     ) -> *mut GBitmap;
-    pub fn gbitmap_create_from_png_data(png_data: *const u8, png_data_size: usize);
+    pub fn gbitmap_create_from_png_data(png_data: *const u8, png_data_size: usize) -> *mut GBitmap;
     pub fn gbitmap_create_blank(size: GSize, format: GBitmapFormat);
     pub fn gbitmap_create_blank_with_palette(
         size: GSize,

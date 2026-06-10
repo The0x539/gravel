@@ -50,3 +50,28 @@ pub type GColor = GColor8;
 
 #[repr(C)]
 pub struct GContext(Opaque);
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+#[repr(u32)]
+pub enum GAlign {
+    Center,
+    TopLeft,
+    TopRight,
+    Top,
+    Left,
+    Bottom,
+    Right,
+    BottomRight,
+    BottomLeft,
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+#[repr(u32)]
+pub enum GCompOp {
+    Assign,
+    AssignInverted,
+    Or,
+    And,
+    Clear,
+    Set,
+}
