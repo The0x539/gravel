@@ -4,7 +4,7 @@ import os.path
 from waflib.TaskGen import extension, feature, before_method
 
 top = "."
-out = "target"
+out = "build"
 
 
 def concat_args(*args: list[str]) -> str:
@@ -52,6 +52,7 @@ def build(ctx):
                 "cargo build",
                 # TODO: support dev builds with debuginfo and whatever pebble build --dev does
                 "--release",
+                "-Z build-std=core,alloc",
                 "-Z json-target-spec",
                 "--target ../thumbv7m-pebble-eabi.json",
                 "--target-dir .",
@@ -60,7 +61,6 @@ def build(ctx):
             ),
             source=[
                 "./Cargo.toml",
-                "./.cargo/config.toml",
                 "./thumbv7m-pebble-eabi.json",
                 *ctx.path.ant_glob("src/**.rs"),
             ],
