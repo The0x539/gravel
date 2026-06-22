@@ -49,19 +49,17 @@ def build(ctx):
         rlib_task = ctx(
             rule=concat_args(
                 f"TARGET_DEVICE={platform_name}",
+                "RUSTFLAGS=-Crelocation-model=pic",
                 "cargo build",
                 # TODO: support dev builds with debuginfo and whatever pebble build --dev does
                 "--release",
-                "-Z build-std=core,alloc",
-                "-Z json-target-spec",
-                "--target ../thumbv7m-pebble-eabi.json",
+                "--target thumbv7m-none-eabi",
                 "--target-dir .",
                 "-Z unstable-options",
                 f"--artifact-dir {build_dir}",
             ),
             source=[
                 "./Cargo.toml",
-                "./thumbv7m-pebble-eabi.json",
                 *ctx.path.ant_glob("src/**.rs"),
             ],
             stderr=None,
