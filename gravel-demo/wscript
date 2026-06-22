@@ -1,8 +1,10 @@
+#!python (for filetype detection)
+
 import os.path
 from waflib.TaskGen import extension, feature, before_method
 
 top = "."
-out = "build"
+out = "target"
 
 
 def concat_args(*args: list[str]) -> str:
@@ -30,23 +32,31 @@ def configure(ctx):
 def build(ctx):
     ctx.load("pebble_sdk")
 
-    # ctx.set_group("bundle")
     binaries = []
-
     base_env = ctx.env
 
     for platform in ctx.env.TARGET_PLATFORMS:
         ctx.env = ctx.all_envs[platform]
-        ctx.set_group(ctx.env.PLATFORM_NAME)
+        platform_name = ctx.env.PLATFORM_NAME
+        build_dir = ctx.env.BUILD_DIR
+        ctx.set_group(platform)
+
+        # TODO: This code shouldn't depend on project name.
+        # The name defined in package.json is pretty easy to access from this build script,
+        # but the name that Rust uses comes from Cargo.toml, and there's no guarantee they match.
+        rlib_name = "libgravel_demo.a"
 
         rlib_task = ctx(
             rule=concat_args(
-                "TARGET_DEVICE=${PLATFORM_NAME}",
+                f"TARGET_DEVICE={platform_name}",
                 "cargo build",
+                # TODO: support dev builds with debuginfo and whatever pebble build --dev does
                 "--release",
                 "-Z json-target-spec",
                 "--target ../thumbv7m-pebble-eabi.json",
                 "--target-dir .",
+                "-Z unstable-options",
+                f"--artifact-dir {build_dir}",
             ),
             source=[
                 "./Cargo.toml",
@@ -54,13 +64,14 @@ def build(ctx):
                 "./thumbv7m-pebble-eabi.json",
                 *ctx.path.ant_glob("src/**.rs"),
             ],
-            target=f"./thumbv7m-pebble-eabi/release/libgravel_demo.a",  # TODO: this code shouldn't depend on project name
+            stderr=None,
+            target=f"{build_dir}/{rlib_name}",
         )
 
         elf_task = ctx.pbl_program(
             features="fake_obj",
             source=[rlib_task.target],
-            target=f"{ctx.env.BUILD_DIR}/pebble-app.elf",
+            target=f"{build_dir}/pebble-app.elf",
         )
         binaries.append({"platform": platform, "app_elf": elf_task.target})
 

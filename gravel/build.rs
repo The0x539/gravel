@@ -9,6 +9,7 @@ fn main() {
 
     println!("cargo::rerun-if-env-changed=TARGET_DEVICE");
 
-    let target_device = std::env::var("TARGET_DEVICE").unwrap_or_else(|_| "emery".into());
-    println!(r#"cargo::rustc-cfg=target_device="{target_device}""#)
+    if let Ok(target_device) = std::env::var("TARGET_DEVICE") {
+        println!(r#"cargo::rustc-cfg=target_device="{target_device}""#);
+    }
 }
