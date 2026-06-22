@@ -55,15 +55,13 @@ def build(ctx):
                 "--release",
                 "--target thumbv7m-none-eabi",
                 "--target-dir .",
-                "-Z unstable-options",
-                f"--artifact-dir {build_dir}",
             ),
             source=[
                 "./Cargo.toml",
                 *ctx.path.ant_glob("src/**.rs"),
             ],
             stderr=None,
-            target=f"{build_dir}/{rlib_name}",
+            target=f"thumbv7m-none-eabi/release/{rlib_name}",
         )
 
         elf_task = ctx.pbl_program(
