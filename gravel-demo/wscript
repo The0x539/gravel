@@ -5,6 +5,10 @@ top = "."
 out = "build"
 
 
+def concat_args(*args: list[str]) -> str:
+    return " ".join(args)
+
+
 @extension(".a")
 def add_artifact_file(self, node):
     self.add_those_o_files(node)
@@ -17,36 +21,49 @@ def options(ctx):
 def configure(ctx):
     ctx.load("pebble_sdk")
 
+    for platform in ctx.env.TARGET_PLATFORMS:
+        platform_env = ctx.all_envs[platform]
+        platform_env.LINKFLAGS += ["-z", "noexecstack"]
+        platform_env.LINKFLAGS += ["-Wl,--no-warn-rwx-segments"]  # ¯\_(ツ)_/¯
+
 
 def build(ctx):
     ctx.load("pebble_sdk")
 
     # ctx.set_group("bundle")
-    foo_target = "thumbv7m-pebble-eabi/release/libgravel_demo.a"
-    foo = ctx(
-        rule="cargo build --release --target ../thumbv7m-pebble-eabi.json -Zjson-target-spec --target-dir .",
-        source=["./Cargo.toml", "./.cargo/config.toml", "./thumbv7m-pebble-eabi.json"]
-        + ctx.path.ant_glob("src/**.rs"),
-        target=foo_target,
-    )
-
     binaries = []
 
     base_env = ctx.env
 
     for platform in ctx.env.TARGET_PLATFORMS:
         ctx.env = ctx.all_envs[platform]
-        # ctx.set_group(ctx.env.PLATFORM_NAME)
-        ctx.env.LINKFLAGS += ["-z", "noexecstack"]
-        ctx.env.LINKFLAGS += ["-Wl,--no-warn-rwx-segments"]  # ¯\_(ツ)_/¯
+        ctx.set_group(ctx.env.PLATFORM_NAME)
 
-        bar = ctx.pbl_program(
+        rlib_task = ctx(
+            rule=concat_args(
+                "TARGET_DEVICE=${PLATFORM_NAME}",
+                "cargo build",
+                "--release",
+                "-Z json-target-spec",
+                "--target ../thumbv7m-pebble-eabi.json",
+                "--target-dir .",
+            ),
+            source=[
+                "./Cargo.toml",
+                "./.cargo/config.toml",
+                "./thumbv7m-pebble-eabi.json",
+                *ctx.path.ant_glob("src/**.rs"),
+            ],
+            target=f"./thumbv7m-pebble-eabi/release/libgravel_demo.a",  # TODO: this code shouldn't depend on project name
+        )
+
+        elf_task = ctx.pbl_program(
             features="fake_obj",
-            source=[foo_target],
+            source=[rlib_task.target],
             target=f"{ctx.env.BUILD_DIR}/pebble-app.elf",
         )
-        binaries.append({"platform": platform, "app_elf": bar.target})
+        binaries.append({"platform": platform, "app_elf": elf_task.target})
 
     ctx.env = base_env
-    # ctx.set_group("bundle")
+    ctx.set_group("bundle")
     ctx.pbl_bundle(binaries=binaries)
