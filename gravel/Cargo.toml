@@ -8,3 +8,19 @@ repository = "https://github.com/The0x539/gravel"
 
 [dependencies]
 gravel-sys = "0.0.1"
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = [
+  """cfg(device_name, values(
+    "aplite",
+    "basalt",
+    "chalk",
+    "diorite",
+    "emery",
+    "flint",
+    "gabbro",
+  ))""",
+  'cfg(device_shape, values("rect", "round"))',
+  'cfg(device_gamut, values("bw", "color"))',
+  'cfg(device_feature, values(any()))',
+] }

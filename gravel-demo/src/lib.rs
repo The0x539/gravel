@@ -1,5 +1,6 @@
 #![no_std]
 
+use gravel::foundation::platform;
 use gravel::graphics::Bitmap;
 use gravel::graphics::types::*;
 use gravel::prelude::*;
@@ -14,7 +15,13 @@ const MRGREEN: &[u8] = include_bytes!("./mrgreen.png");
 #[unsafe(no_mangle)]
 pub extern "C" fn main() -> isize {
     unsafe {
-        log!(Info, c"foo\n");
+        log!(
+            Info,
+            c"foo %d %d %d\n",
+            platform::PlatformType::CURRENT,
+            platform::DISPLAY_SIZE.x as i32,
+            platform::DISPLAY_SIZE.y as i32,
+        );
     }
 
     let window = Window::new();
@@ -25,8 +32,7 @@ pub extern "C" fn main() -> isize {
     let bitmap = Bitmap::from_png(MRGREEN).unwrap();
 
     let mut frame = GRect::default();
-    frame.size.x = 64;
-    frame.size.y = 64;
+    frame.size = platform::DISPLAY_SIZE;
     let mut layer = BitmapLayer::new(frame).unwrap();
     layer.set_bitmap(&bitmap);
     window.root_layer().add_child(&layer.get_layer());

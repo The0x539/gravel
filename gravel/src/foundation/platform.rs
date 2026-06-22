@@ -1,3 +1,5 @@
+use gravel_sys::graphics::types::GSize;
+
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum PlatformType {
     /// Pebble
@@ -16,55 +18,45 @@ pub enum PlatformType {
     Gabbro,
 }
 
-macro_rules! define_bool {
-    ($(
-        [$define:ident] $($device:ident)*
-    )*) => {$(
-        pub const fn $define(&self) -> bool {
-            matches!(self, $(Self::$device)|*)
-        }
-    )*};
+macro_rules! devices {
+    ($($name:literal => $variant:ident,)*) => {
+        $(
+            #[cfg(device_name = $name)]
+            pub const CURRENT: Self = Self::$variant;
+        )*
+
+        #[cfg(not(any($(device_name = $name),*)))]
+        pub const CURRENT: Self = panic!("Unknown device codename");
+    };
 }
 
 impl PlatformType {
-    pub const CURRENT: Self = cfg_select! {
-        target_device = "aplite" => Self::Aplite,
-        target_device = "basalt" => Self::Basalt,
-        target_device = "chalk" => Self::Chalk,
-        target_device = "diorite" => Self::Diorite,
-        target_device = "emery" => Self::Emery,
-        target_device = "flint" => Self::Flint,
-        target_device = "gabbro" => Self::Gabbro,
-        _ => panic!("No device specified"),
-    };
-
-    define_bool! {
-        [black_and_white] Aplite              Diorite       Flint
-        [color]                  Basalt Chalk         Emery       Gabbro
-        [microphone]             Basalt Chalk Diorite Emery Flint Gabbro
-        [compass]         Aplite Basalt Chalk         Emery Flint Gabbro
-        [health]                 Basalt Chalk Diorite Emery Flint Gabbro
-        [rectangular]     Aplite Basalt       Diorite Emery Flint
-        [round]                         Chalk                     Gabbro
-        [speaker]                                     Emery Flint
-        [touch]                                       Emery       Gabbro
-    }
-
-    pub const fn display_size(&self) -> (u16, u16) {
-        match self {
-            Self::Aplite | Self::Basalt | Self::Diorite | Self::Flint => (144, 168),
-            Self::Chalk => (180, 180),
-            Self::Emery => (200, 228),
-            Self::Gabbro => (260, 260),
-        }
-    }
-
-    pub const fn display_density(&self) -> u16 {
-        match self {
-            Self::Aplite | Self::Diorite | Self::Flint => 175,
-            Self::Basalt | Self::Chalk => 182,
-            Self::Emery => 202,
-            Self::Gabbro => 200,
-        }
+    devices! {
+        "aplite"  => Aplite,
+        "basalt"  => Basalt,
+        "chalk"   => Chalk,
+        "diorite" => Diorite,
+        "emery"   => Emery,
+        "flint"   => Flint,
+        "gabbro"  => Gabbro,
     }
 }
+
+macro_rules! env_int {
+    ($var:literal, $t:ty) => {
+        'a: {
+            let Some(s) = option_env!("PBL_DISPLAY_WIDTH") else {
+                break 'a 0;
+            };
+            let Ok(n) = <$t>::from_str_radix(s, 10) else {
+                break 'a 0;
+            };
+            n
+        }
+    };
+}
+
+pub const DISPLAY_SIZE: GSize = GSize {
+    x: env_int!("PBL_DISPLAY_WIDTH", i16),
+    y: env_int!("PBL_DISPLAY_HEIGHT", i16),
+};

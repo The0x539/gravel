@@ -1,6 +1,7 @@
 #!python (for filetype detection)
 
 import os.path
+import re
 from waflib.TaskGen import extension, feature, before_method
 
 top = "."
@@ -24,9 +25,28 @@ def configure(ctx):
     ctx.load("pebble_sdk")
 
     for platform in ctx.env.TARGET_PLATFORMS:
-        platform_env = ctx.all_envs[platform]
-        platform_env.LINKFLAGS += ["-z", "noexecstack"]
-        platform_env.LINKFLAGS += ["-Wl,--no-warn-rwx-segments"]  # ¯\_(ツ)_/¯
+        env = ctx.all_envs[platform]
+        env.LINKFLAGS += ["-z", "noexecstack"]
+        env.LINKFLAGS += ["-Wl,--no-warn-rwx-segments"]  # ¯\_(ツ)_/¯
+
+        env.RUST_CFG = [("device_name", env.PLATFORM_NAME)]
+
+        for tag in env.PLATFORM["TAGS"]:
+            match tag:
+                case "rect" | "round":
+                    env.RUST_CFG.append(("device_shape", tag))
+                case "bw" | "color":
+                    env.RUST_CFG.append(("device_gamut", tag))
+                case (
+                    "mic"
+                    | "strap"
+                    | "strappower"
+                    | "compass"
+                    | "health"
+                    | "touch"
+                    | "speaker"
+                ):
+                    env.RUST_CFG.append(("device_feature", tag))
 
 
 def build(ctx):
@@ -46,10 +66,22 @@ def build(ctx):
         # but the name that Rust uses comes from Cargo.toml, and there's no guarantee they match.
         rlib_name = "libgravel_demo.a"
 
+        rust_flags = ["-C", "relocation-model=pic"]
+
+        for cfg_item in ctx.env.RUST_CFG:
+            rust_flags.append("--cfg")
+            match cfg_item:
+                case (name, val):
+                    rust_flags.append(rf"{name}=\"{val}\"")
+                case name:
+                    rust_flags.append(name)
+
+        screen_size_args = (d for d in ctx.env.DEFINES if "PBL_DISPLAY_" in d)
+
         rlib_task = ctx(
             rule=concat_args(
-                f"TARGET_DEVICE={platform_name}",
-                "RUSTFLAGS=-Crelocation-model=pic",
+                "CARGO_ENCODED_RUSTFLAGS=" + "\x1f".join(rust_flags),
+                *screen_size_args,
                 "cargo build",
                 # TODO: support dev builds with debuginfo and whatever pebble build --dev does
                 "--release",
