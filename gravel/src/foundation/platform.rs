@@ -57,6 +57,6 @@ macro_rules! env_int {
 }
 
 pub const DISPLAY_SIZE: GSize = GSize {
-    x: env_int!("PBL_DISPLAY_WIDTH", i16),
-    y: env_int!("PBL_DISPLAY_HEIGHT", i16),
+    w: env_int!("PBL_DISPLAY_WIDTH", i16),
+    h: env_int!("PBL_DISPLAY_HEIGHT", i16),
 };

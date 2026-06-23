@@ -38,10 +38,10 @@ pub extern "C" fn main() -> isize {
         let src_buf = unscaled.get_buffer();
         let dst_buf = scaled.get_buffer();
 
-        for dst_y in 0..src_bounds.size.y {
-            let src_y = dst_y * dst_bounds.size.y / src_bounds.size.y;
-            for dst_x in 0..src_bounds.size.x {
-                let src_x = dst_x * dst_bounds.size.x / src_bounds.size.x;
+        for dst_y in 0..src_bounds.size.h {
+            let src_y = dst_y * dst_bounds.size.h / src_bounds.size.h;
+            for dst_x in 0..src_bounds.size.w {
+                let src_x = dst_x * dst_bounds.size.w / src_bounds.size.w;
                 let dst_i = from_coords(GPoint::new(dst_x, dst_y), src_bounds.size);
                 let src_i = from_coords(GPoint::new(src_x, src_y), dst_bounds.size);
 
@@ -90,5 +90,5 @@ pub extern "C" fn main() -> isize {
 }
 
 fn from_coords(point: GPoint, dims: GSize) -> usize {
-    point.y as usize * dims.x as usize + point.x as usize
+    point.y as usize * dims.w as usize + point.x as usize
 }
