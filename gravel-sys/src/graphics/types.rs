@@ -7,11 +7,23 @@ pub struct GPoint {
     pub y: i16,
 }
 
+impl GPoint {
+    pub const fn new(x: i16, y: i16) -> Self {
+        Self { x, y }
+    }
+}
+
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 pub struct GSize {
     pub x: i16,
     pub y: i16,
+}
+
+impl GSize {
+    pub const fn new(x: i16, y: i16) -> Self {
+        Self { x, y }
+    }
 }
 
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]

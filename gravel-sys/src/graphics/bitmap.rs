@@ -27,13 +27,13 @@ unsafe extern "C" {
         sub_rect: GRect,
     ) -> *mut GBitmap;
     pub fn gbitmap_create_from_png_data(png_data: *const u8, png_data_size: usize) -> *mut GBitmap;
-    pub fn gbitmap_create_blank(size: GSize, format: GBitmapFormat);
+    pub fn gbitmap_create_blank(size: GSize, format: GBitmapFormat) -> *mut GBitmap;
     pub fn gbitmap_create_blank_with_palette(
         size: GSize,
         format: GBitmapFormat,
         palette: *mut GColor,
         free_on_destroy: bool,
-    );
+    ) -> *mut GBitmap;
     pub fn gbitmap_create_palettized_from_1bit(src_bitmap: *const GBitmap) -> *mut GBitmap;
     pub fn gbitmap_destroy(bitmap: *mut GBitmap);
     pub fn gbitmap_sequence_create_with_resource(resource_id: u32) -> *mut GBitmapSequence;
