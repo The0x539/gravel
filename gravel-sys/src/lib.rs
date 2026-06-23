@@ -30,7 +30,7 @@ pub mod foundation {
     pub mod memory_management;
     pub mod resources;
     pub mod storage;
-    // pub mod timer;
+    pub mod timer;
     // pub mod wakeup;
     // pub mod wall_time;
     // pub mod watch_info;
