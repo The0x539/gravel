@@ -1,6 +1,4 @@
-use crate::allocator::GLOBAL;
 use alloc::boxed::Box;
-use core::alloc::{GlobalAlloc, Layout};
 use core::ffi::c_void;
 use gravel_sys::foundation::event::touch as sys;
 pub use sys::TouchEvent;
@@ -18,19 +16,19 @@ fn cleanup() {
     }
 }
 
+unsafe fn cleanup_func<H: TouchServiceHandler>(data: *mut c_void) {
+    unsafe {
+        let data: *mut H = data.cast();
+        drop(Box::from_raw(data));
+    }
+}
+
 pub fn subscribe<H: TouchServiceHandler>(handler: H) {
     cleanup();
 
-    // let data = Box::into_raw(Box::new(handler)).cast::<c_void>();
+    let data = Box::into_raw(Box::new(handler)).cast::<c_void>();
     unsafe {
-        let data = GLOBAL.alloc(Layout::for_value(&handler)).cast::<c_void>();
-        core::ptr::write(data.cast(), handler);
-
-        CLEANUP_DATA = Some((data, |data: *mut c_void| {
-            let data: *mut H = data.cast();
-            core::ptr::drop_in_place(data);
-            GLOBAL.dealloc(data.cast(), Layout::new::<H>());
-        }));
+        CLEANUP_DATA = Some((data, cleanup_func::<H>));
         sys::touch_service_subscribe(H::handle_sys, data);
     }
 }

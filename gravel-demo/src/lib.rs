@@ -41,8 +41,10 @@ pub extern "C" fn main() -> isize {
         }
     }
 
+    let size = platform::DISPLAY_SIZE;
+
     let mut frame = GRect::default();
-    frame.size = platform::DISPLAY_SIZE;
+    frame.size = size;
     let mut layer = BitmapLayer::new(frame).unwrap();
     layer.set_bitmap(&scaled);
     let root_layer = window.root_layer();
