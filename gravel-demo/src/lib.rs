@@ -3,6 +3,7 @@
 extern crate alloc;
 
 use gravel::foundation::platform;
+use gravel::foundation::watch_info;
 use gravel::graphics::Bitmap;
 use gravel::graphics::types::*;
 use gravel::prelude::*;
@@ -15,6 +16,15 @@ const MRGREEN: &[u8] = include_bytes!("./mrgreen.png");
 #[unsafe(no_mangle)]
 pub extern "C" fn main() -> isize {
     let window = Window::new();
+
+    unsafe {
+        gravel::log!(
+            Info,
+            c"model/color: %d/%d\n",
+            watch_info::model(),
+            watch_info::color(),
+        );
+    }
 
     window.set_background_color(GColor::from_argb(3, 1, 2, 3));
     window_stack::push(&window, true);
