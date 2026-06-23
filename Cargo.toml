@@ -4,3 +4,9 @@ members = ["gravel", "gravel-sys", "gravel-demo"]
 
 [patch.crates-io]
 gravel-sys.path = "./gravel-sys"
+
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+panic = "abort"
