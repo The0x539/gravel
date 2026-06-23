@@ -14,20 +14,27 @@ pub(crate) trait SysResult {
 macro_rules! error_enum {
     (
         $vis:vis enum $nice:ident : $sys:path;
-        $($nice_variant:ident = $sys_variant:ident;)*
+        $(
+            $(#[$attr:meta])*
+            $nice_variant:ident = $sys_variant:ident;
+        )*
         $(@ $custom_variant:ident = $custom_value:literal;)*
+        $(@@other = $other_discrim:literal;)?
     ) => {
         #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
         #[repr(i32)]
         $vis enum $nice {
-            $($nice_variant = <$sys>::$sys_variant.0,)*
+            $(
+                $(#[$attr])*
+                $nice_variant = <$sys>::$sys_variant.0,
+            )*
             $($custom_variant = $custom_value,)*
-            Other(core::ffi::c_int),
+            Other(core::ffi::c_int) $(= $other_discrim)?,
         }
 
-        impl SysResult for $sys {
+        impl $crate::util::SysResult for $sys {
             type NiceErr = $nice;
-            fn into_nice(self) -> Result<(), Self::NiceErr> {
+            fn into_nice(self) -> core::result::Result<(), Self::NiceErr> {
                 $(const $sys_variant: core::ffi::c_int = <$sys>::$sys_variant.0;)*
 
                 match self.0 {

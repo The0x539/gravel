@@ -47,7 +47,8 @@ pub mod foundation {
     pub mod memory_management;
     pub mod platform;
     pub mod resources;
-    // pub mod storage;
+    #[doc(alias = "persist")]
+    pub mod storage;
     // pub mod timer;
     // pub mod wakeup;
     // pub mod wall_time;

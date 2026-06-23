@@ -29,7 +29,7 @@ pub mod foundation {
     pub mod math;
     pub mod memory_management;
     pub mod resources;
-    // pub mod storage;
+    pub mod storage;
     // pub mod timer;
     // pub mod wakeup;
     // pub mod wall_time;
