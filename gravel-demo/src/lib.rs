@@ -10,28 +10,11 @@ use gravel::ui::layer::BitmapLayer;
 use gravel::ui::window::Window;
 use gravel::ui::window_stack;
 
-use gravel::log;
-
 const MRGREEN: &[u8] = include_bytes!("./mrgreen.png");
 
 #[unsafe(no_mangle)]
 pub extern "C" fn main() -> isize {
-    unsafe {
-        log!(
-            Info,
-            c"foo %d %d %d\n",
-            platform::PlatformType::CURRENT,
-            platform::DISPLAY_SIZE.x as i32,
-            platform::DISPLAY_SIZE.y as i32,
-        );
-    }
-
     let window = Window::new();
-
-    let size = GSize::new(
-        platform::DISPLAY_SIZE.x * 2 / 3,
-        platform::DISPLAY_SIZE.y * 2 / 3,
-    );
 
     window.set_background_color(GColor::from_argb(3, 1, 2, 3));
     window_stack::push(&window, true);
@@ -39,7 +22,7 @@ pub extern "C" fn main() -> isize {
     let unscaled = Bitmap::from_png(MRGREEN).unwrap();
     // assume BIT_8 format in this proof of concept
     let dst_bounds = unscaled.bounds();
-    let scaled = Bitmap::blank(size, unscaled.format()).unwrap();
+    let scaled = Bitmap::blank(platform::DISPLAY_SIZE, unscaled.format()).unwrap();
     unsafe {
         let src_bounds = scaled.bounds();
         let src_buf = unscaled.get_buffer();
@@ -62,7 +45,32 @@ pub extern "C" fn main() -> isize {
     frame.size = platform::DISPLAY_SIZE;
     let mut layer = BitmapLayer::new(frame).unwrap();
     layer.set_bitmap(&scaled);
-    window.root_layer().add_child(&layer.get_layer());
+    let root_layer = window.root_layer();
+    root_layer.add_child(&layer.get_layer());
+
+    #[cfg(device_feature = "touch")]
+    gravel::foundation::event::touch::subscribe(move |event| unsafe {
+        let x_range = 0..size.x;
+        let y_range = 0..size.y;
+
+        for dy in -2..=2 {
+            if !y_range.contains(&(event.y + dy)) {
+                continue;
+            }
+
+            for dx in -2..=2 {
+                if !x_range.contains(&(event.x + dx)) {
+                    continue;
+                }
+
+                let i = from_coords(GPoint::new(event.x + dx, event.y + dy), size);
+                let pixel = scaled.get_buffer().add(i);
+                *pixel = !*pixel;
+            }
+        }
+
+        layer.get_layer().mark_dirty();
+    });
 
     gravel::foundation::app::event_loop();
 

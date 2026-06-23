@@ -14,7 +14,7 @@ pub struct TouchEvent {
 }
 
 c_enum! {
-    pub enum TouchEventType;
+    pub enum TouchEventType: u8;
     TOUCHDOWN = 0;
     LIFTOFF = 1;
     POSITION_UPDATE = 2;

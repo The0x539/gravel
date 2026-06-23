@@ -5,7 +5,7 @@ macro_rules! log {
             $crate::foundation::logging::LogLevel::$level as u8,
             concat!(file!(), "\0").as_ptr().cast(),
             line!() as i32,
-            $fmt.as_ptr(),
+            ::core::ffi::CStr::as_ptr($fmt),
             $($args),*
         )
     };

@@ -2,7 +2,7 @@ use core::alloc::{GlobalAlloc, Layout};
 use core::ffi::c_void;
 use gravel_sys::std_c::memory as c;
 
-struct PebbleAllocator;
+pub struct PebbleAllocator;
 
 // TODO: alignment lol
 unsafe impl GlobalAlloc for PebbleAllocator {
@@ -24,4 +24,4 @@ unsafe impl GlobalAlloc for PebbleAllocator {
 }
 
 #[global_allocator]
-static GLOBAL: PebbleAllocator = PebbleAllocator;
+pub static GLOBAL: PebbleAllocator = PebbleAllocator;

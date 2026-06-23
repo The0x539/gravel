@@ -19,6 +19,7 @@ pub mod foundation {
         pub mod connection;
         // pub mod health;
         pub mod tick_timer;
+        #[cfg(device_feature = "touch")]
         pub mod touch;
     }
     pub mod exit_reason;

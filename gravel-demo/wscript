@@ -66,7 +66,7 @@ def build(ctx):
         # but the name that Rust uses comes from Cargo.toml, and there's no guarantee they match.
         rlib_name = "libgravel_demo.a"
 
-        rust_flags = ["-C", "relocation-model=pic"]
+        rust_flags = ["-C", "relocation-model=pic", "-C", "panic=abort"]
 
         for cfg_item in ctx.env.RUST_CFG:
             rust_flags.append("--cfg")
