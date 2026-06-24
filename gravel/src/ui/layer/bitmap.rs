@@ -1,6 +1,7 @@
 use super::LayerRef;
 use crate::graphics::{
     Bitmap, GCompOp,
+    bitmap::BitmapV2,
     color::GColor,
     geometry::{GAlign, GRect},
 };
@@ -27,6 +28,10 @@ impl BitmapLayer {
     //pub fn get_bitmap(&self);
 
     pub fn set_bitmap(&mut self, bitmap: &Bitmap) {
+        unsafe { sys::bitmap_layer_set_bitmap(self.inner, bitmap.as_raw().cast_const()) }
+    }
+
+    pub fn set_bitmap_v2<Fmt, Mem>(&mut self, bitmap: &BitmapV2<Fmt, Mem>) {
         unsafe { sys::bitmap_layer_set_bitmap(self.inner, bitmap.as_raw().cast_const()) }
     }
 

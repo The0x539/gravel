@@ -3,10 +3,10 @@
 extern crate alloc;
 
 use gravel::foundation::platform;
-use gravel::foundation::watch_info;
-use gravel::graphics::Bitmap;
+use gravel::graphics::bitmap::Raw8Bit;
+use gravel::graphics::bitmap::{BitmapV2, DynamicBitmap};
 use gravel::graphics::color::GColor;
-use gravel::graphics::geometry::{GPoint, GRect, GSize};
+use gravel::graphics::geometry::GRect;
 use gravel::prelude::*;
 use gravel::ui::layer::BitmapLayer;
 use gravel::ui::window::Window;
@@ -18,53 +18,52 @@ const MRGREEN: &[u8] = include_bytes!("./mrgreen.png");
 pub extern "C" fn main() -> isize {
     let window = Window::new();
 
-    unsafe {
-        gravel::log!(
-            Info,
-            c"model/color: %d/%d\n",
-            watch_info::model(),
-            watch_info::color(),
-        );
-    }
-
     window.set_background_color(GColor::PICTON_BLUE);
     window_stack::push(&window, true);
 
-    let unscaled = Bitmap::from_png(MRGREEN).unwrap();
-    // assume BIT_8 format in this proof of concept
-    let dst_bounds = unscaled.bounds();
-    let scaled = Bitmap::blank(platform::DISPLAY_SIZE, unscaled.format()).unwrap();
-    unsafe {
-        let src_bounds = scaled.bounds();
-        let src_buf = unscaled.get_buffer();
-        let dst_buf = scaled.get_buffer();
+    let unscaled = match BitmapV2::from_png(MRGREEN).unwrap().into_known_format() {
+        DynamicBitmap::Raw8Bit(b) => b,
+        _ => panic!(),
+    };
+    let src_bounds = unscaled.bounds();
 
-        for dst_y in 0..src_bounds.size.h {
-            let src_y = dst_y * dst_bounds.size.h / src_bounds.size.h;
-            for dst_x in 0..src_bounds.size.w {
-                let src_x = dst_x * dst_bounds.size.w / src_bounds.size.w;
-                let dst_i = from_coords(GPoint::new(dst_x, dst_y), src_bounds.size);
-                let src_i = from_coords(GPoint::new(src_x, src_y), dst_bounds.size);
+    let mut scaled = BitmapV2::<Raw8Bit, _>::create_blank(platform::DISPLAY_SIZE).unwrap();
 
-                let pixel = *src_buf.add(src_i);
-                *dst_buf.add(dst_i) = pixel;
-            }
+    let dst_bounds = GRect {
+        size: platform::DISPLAY_SIZE,
+        ..Default::default()
+    };
+    for dst_y in 0..dst_bounds.size.h {
+        let src_y = dst_y as u32 * src_bounds.size.h as u32 / dst_bounds.size.h as u32;
+
+        let mut dst_row = scaled.row_mut(dst_y as u16).unwrap();
+        let src_row = unscaled.row(src_y as u16).unwrap();
+
+        for dst_x in 0..dst_bounds.size.w {
+            let src_x = dst_x as u32 * src_bounds.size.w as u32 / dst_bounds.size.w as u32;
+            let pixel = src_row.get_pixel(src_x as u16);
+            dst_row.set_pixel(dst_x as u16, pixel);
         }
     }
+
+    // let mut bounds = scaled.bounds();
+    // bounds.size.h /= 2;
+    // bounds.origin.y += bounds.size.h / 2;
+    // scaled.set_bounds(bounds);
 
     let size = platform::DISPLAY_SIZE;
 
     let mut frame = GRect::default();
     frame.size = size;
     let mut layer = BitmapLayer::new(frame).unwrap();
-    layer.set_bitmap(&scaled);
+    layer.set_bitmap_v2(&scaled);
     let root_layer = window.root_layer();
     root_layer.add_child(&layer.get_layer());
 
     #[cfg(device_feature = "touch")]
-    gravel::foundation::event::touch::subscribe(move |event| unsafe {
-        let x_range = 0..size.x;
-        let y_range = 0..size.y;
+    gravel::foundation::event::touch::subscribe(move |event| {
+        let x_range = 0..size.w;
+        let y_range = 0..size.h;
 
         for dy in -2..=2 {
             if !y_range.contains(&(event.y + dy)) {
@@ -76,9 +75,14 @@ pub extern "C" fn main() -> isize {
                     continue;
                 }
 
-                let i = from_coords(GPoint::new(event.x + dx, event.y + dy), size);
-                let pixel = scaled.get_buffer().add(i);
-                *pixel = !*pixel;
+                let x = (event.x + dx) as u16;
+                let y = (event.y + dy) as u16;
+
+                let Some(mut pixel) = scaled.get_pixel(x, y) else {
+                    continue;
+                };
+                pixel.argb = !pixel.argb;
+                scaled.set_pixel(x, y, pixel);
             }
         }
 
@@ -88,8 +92,4 @@ pub extern "C" fn main() -> isize {
     gravel::foundation::app::event_loop();
 
     0
-}
-
-fn from_coords(point: GPoint, dims: GSize) -> usize {
-    point.y as usize * dims.w as usize + point.x as usize
 }
