@@ -5,7 +5,8 @@ extern crate alloc;
 use gravel::foundation::platform;
 use gravel::foundation::watch_info;
 use gravel::graphics::Bitmap;
-use gravel::graphics::types::*;
+use gravel::graphics::color::GColor;
+use gravel::graphics::geometry::{GPoint, GRect, GSize};
 use gravel::prelude::*;
 use gravel::ui::layer::BitmapLayer;
 use gravel::ui::window::Window;
@@ -26,7 +27,7 @@ pub extern "C" fn main() -> isize {
         );
     }
 
-    window.set_background_color(GColor::from_argb(3, 1, 2, 3));
+    window.set_background_color(GColor::PICTON_BLUE);
     window_stack::push(&window, true);
 
     let unscaled = Bitmap::from_png(MRGREEN).unwrap();

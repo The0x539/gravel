@@ -1,6 +1,7 @@
 use core::marker::PhantomData;
 
-use gravel_sys::{graphics::types::GRect, ui::layer as sys};
+use crate::graphics::geometry::GRect;
+use gravel_sys::ui::layer as sys;
 
 // pub mod action_bar;
 mod bitmap;

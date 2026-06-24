@@ -1,4 +1,5 @@
-use crate::graphics::types::{GContext, GPoint, GRect};
+use crate::graphics::GContext;
+use crate::graphics::geometry::{GPoint, GRect};
 use crate::ui::window::Window;
 use crate::util::Opaque;
 use core::ffi::c_void;

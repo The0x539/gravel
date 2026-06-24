@@ -1,6 +1,6 @@
 use core::ffi::c_void;
 
-use crate::graphics::types::GColor;
+use crate::graphics::color::GColor;
 use crate::ui::clicks::{ButtonId, ClickConfigProvider, ClickHandler};
 use crate::ui::layer::Layer;
 use crate::util::Opaque;

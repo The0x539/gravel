@@ -1,4 +1,5 @@
-use super::types::{GColor, GRect, GSize};
+use super::color::GColor;
+use super::geometry::{GRect, GSize};
 use crate::util::Opaque;
 
 unsafe extern "C" {

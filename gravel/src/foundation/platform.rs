@@ -1,4 +1,4 @@
-use gravel_sys::graphics::types::GSize;
+use gravel_sys::graphics::geometry::GSize;
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum PlatformType {

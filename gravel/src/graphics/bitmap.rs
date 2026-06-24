@@ -1,5 +1,5 @@
+use super::geometry::{GRect, GSize};
 use gravel_sys::graphics::bitmap as sys;
-use gravel_sys::graphics::types::{GRect, GSize};
 
 pub use sys::GBitmapFormat;
 

@@ -1,10 +1,7 @@
-use crate::{
-    graphics::{
-        bitmap::GBitmap,
-        types::{GAlign, GColor, GCompOp, GRect},
-    },
-    util::Opaque,
-};
+use crate::graphics::GCompOp;
+use crate::graphics::bitmap::GBitmap;
+use crate::graphics::color::GColor;
+use crate::graphics::geometry::{GAlign, GRect};
 
 unsafe extern "C" {
     pub fn bitmap_layer_create(frame: GRect) -> *mut BitmapLayer;
@@ -18,4 +15,4 @@ unsafe extern "C" {
 }
 
 #[repr(C)]
-pub struct BitmapLayer(Opaque);
+pub struct BitmapLayer(crate::util::Opaque);

@@ -1,7 +1,8 @@
 use super::LayerRef;
 use crate::graphics::{
-    Bitmap,
-    types::{GAlign, GColor, GCompOp, GRect},
+    Bitmap, GCompOp,
+    color::GColor,
+    geometry::{GAlign, GRect},
 };
 use gravel_sys::ui::layer::bitmap as sys;
 

@@ -1,7 +1,22 @@
+pub mod bitmap;
+pub mod color;
+pub mod geometry;
 // pub mod gdraw;
 // pub mod gpath;
-pub mod types;
 // pub mod text;
 // pub mod fonts;
 // pub mod context;
-pub mod bitmap;
+
+#[repr(C)]
+pub struct GContext(crate::util::Opaque);
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+#[repr(u32)]
+pub enum GCompOp {
+    Assign,
+    AssignInverted,
+    Or,
+    And,
+    Clear,
+    Set,
+}

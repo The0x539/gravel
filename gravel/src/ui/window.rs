@@ -1,6 +1,6 @@
 use alloc::boxed::Box;
 use core::{ffi::c_void, marker::PhantomData};
-use gravel_sys::{graphics::types::GColor, ui::window as sys};
+use gravel_sys::{graphics::color::GColor, ui::window as sys};
 
 use crate::{
     ui::{
